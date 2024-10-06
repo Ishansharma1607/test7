@@ -39,7 +39,7 @@ await fetch('/save-text', {
     <div className="flex items-center justify-center h-screen bg-gray-100">
       <div className="w-full max-w-2xl">
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-          <h2 className="text-2xl font-bold mb-6 text-center">Enter Text</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">Enter Text 1</h2>
           <div className="mb-4">
 <QuillNoSSRWrapper
   value={text}
