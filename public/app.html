@@ -10,7 +10,14 @@
     async function loadText() {
       const response = await fetch('/load-text');
       const text = await response.text();
-      document.getElementById('textArea').value = text;
+      ClassicEditor
+        .create(document.querySelector('#textArea'))
+        .then(editor => {
+          editor.setData(text);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
 
     window.onload = loadText;
@@ -22,6 +29,15 @@
       <h2 class="text-2xl font-bold mb-6 text-center">Enter Text 3</h2>
       <div class="mb-4">
         <textarea id="textArea" name="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="10" placeholder="Enter your text here..."></textarea>
+        <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+        <script>
+            ClassicEditor
+                .create(document.querySelector('#textArea'))
+                .catch(error => {
+                    console.error(error);
+                });
+        </script>
+
       </div>
       <div class="flex items-center justify-between">
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
