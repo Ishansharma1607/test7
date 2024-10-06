@@ -34,8 +34,19 @@ app.get('/app', authMiddleware, (req, res) => {
 
 app.post('/save-text', authMiddleware, (req, res) => {
   const { text } = req.body;
+  if (!text || typeof text !== 'string') {
+    res.status(400).send({ error: 'Invalid text' });
+    return;
+  }
+
+  const trimmedText = text.trim();
+  if (trimmedText.length === 0) {
+    res.status(400).send({ error: 'Text cannot be empty' });
+    return;
+  }
+
   const insertQuery = db.prepare('INSERT INTO user_text (text_content) VALUES (?)');
-  insertQuery.run(JSON.stringify(text));
+  insertQuery.run(JSON.stringify(trimmedText));
   res.redirect('/app');
 });
 
