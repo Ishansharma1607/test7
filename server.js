@@ -18,7 +18,11 @@ app.use(session({
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/styles', express.static(path.join(__dirname, 'styles')));
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'app.html'));
+});
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
@@ -33,15 +37,15 @@ app.get('/app', authMiddleware, (req, res) => {
 
 app.post('/save-text', authMiddleware, (req, res) => {
   const { text } = req.body;
-  const insertQuery = db.prepare('INSERT INTO user_text (text_content) VALUES (?)');
-  insertQuery.run(JSON.stringify(text));
+const insertQuery = db.prepare('INSERT INTO user_text (text_content) VALUES (?)');
+insertQuery.run(text);
   res.redirect('/app');
 });
 
 app.get('/load-text', authMiddleware, (req, res) => {
   const selectQuery = db.prepare('SELECT text_content FROM user_text ORDER BY id DESC LIMIT 1');
   const row = selectQuery.get();
-  res.json(row ? JSON.parse(row.text_content) : '');
+res.json(row ? row.text_content : '');
 });
 
 app.listen(PORT, () => {
