@@ -53,12 +53,14 @@ app.post('/save-text', authMiddleware, (req, res) => {
 app.get('/load-text', authMiddleware, (req, res) => {
   const selectQuery = db.prepare('SELECT text_content FROM user_text ORDER BY id DESC LIMIT 1');
   const row = selectQuery.get();
-try {
-    res.json(row ? JSON.parse(row.text_content) : '');
-} catch (error) {
+
+  try {
+    const textContent = row ? JSON.parse(row.text_content) : '';
+    res.send(textContent);
+  } catch (error) {
     console.error('Error parsing JSON:', error);
     res.status(500).json({ error: 'Failed to parse text content' });
-}
+  }
 });
 
 app.listen(PORT, () => {
