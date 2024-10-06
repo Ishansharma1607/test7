@@ -1,5 +1,5 @@
 
-import { loginHandler } from '../../../auth';
+import { loginHandler } from '../../auth';
 
 export default function handler(req, res) {
   if (req.method === 'POST') {
