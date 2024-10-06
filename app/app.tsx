@@ -15,7 +15,7 @@ export default function App() {
     loadText();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await fetch('/save-text', {
       method: 'POST',
