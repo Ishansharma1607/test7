@@ -1,6 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
 export default function App() {
   const [text, setText] = useState('');
@@ -39,15 +42,11 @@ export default function App() {
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <h2 className="text-2xl font-bold mb-6 text-center">Enter Text</h2>
           <div className="mb-4">
-            <textarea
-              id="textArea"
-              name="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              rows={10}
-              placeholder="Enter your text here..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            ></textarea>
+<ReactQuill
+  value={text}
+  onChange={setText}
+  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+/>
           </div>
           <div className="flex items-center justify-between">
             <button
