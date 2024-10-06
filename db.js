@@ -1,11 +1,20 @@
 
 const path = require('path');
+const fs = require('fs');
 const Database = require('better-sqlite3');
-const dbPath = process.env.DB_PATH || path.resolve(__dirname, 'user_data.db');
+
+// Define the source and destination paths
+const srcDbPath = path.resolve(__dirname, 'user_data.db');
+const destDbPath = path.resolve('/tmp', 'user_data.db');
+
+// Copy the database file to a writable directory
+if (!fs.existsSync(destDbPath)) {
+  fs.copyFileSync(srcDbPath, destDbPath);
+}
 
 let db;
 try {
-  db = new Database(dbPath);
+  db = new Database(destDbPath);
 } catch (err) {
   console.error('Failed to open database:', err);
   throw err;
