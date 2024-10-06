@@ -9,6 +9,7 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('Login request:', { username, password });
     const response = await fetch('/login', {
       method: 'POST',
       headers: {
