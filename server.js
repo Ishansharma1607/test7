@@ -18,6 +18,7 @@ app.use(session({
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/styles', express.static(path.join(__dirname, 'styles')));
 
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
@@ -41,7 +42,12 @@ app.post('/save-text', authMiddleware, (req, res) => {
 app.get('/load-text', authMiddleware, (req, res) => {
   const selectQuery = db.prepare('SELECT text_content FROM user_text ORDER BY id DESC LIMIT 1');
   const row = selectQuery.get();
-  res.json(row ? JSON.parse(row.text_content) : '');
+try {
+    res.json(row ? JSON.parse(row.text_content) : '');
+} catch (error) {
+    console.error('Error parsing JSON:', error);
+    res.status(500).json({ error: 'Failed to parse text content' });
+}
 });
 
 app.listen(PORT, () => {
