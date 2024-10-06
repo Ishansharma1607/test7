@@ -8,7 +8,7 @@ export default function App() {
 
   useEffect(() => {
     const loadText = async () => {
-      const response = await fetch('/load-text');
+      const response = await fetch('http://localhost:3000/load-text');
       const text = await response.text();
       setText(text);
     };
@@ -17,7 +17,7 @@ export default function App() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await fetch('/save-text', {
+    await fetch('http://localhost:3000/save-text', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -29,7 +29,7 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await fetch('/logout');
+    await fetch('http://localhost:3000/logout');
     router.push('/login');
   };
 
