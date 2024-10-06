@@ -5,7 +5,7 @@ const Database = require('better-sqlite3');
 
 // Define the source and destination paths
 const srcDbPath = path.resolve(__dirname, 'user_data.db');
-const destDbPath = path.resolve('/tmp', 'user_data.db');
+const destDbPath = path.resolve(__dirname, 'data', 'user_data.db');
 
 // Copy the database file to a writable directory
 if (!fs.existsSync(destDbPath)) {
