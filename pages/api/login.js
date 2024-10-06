@@ -1,11 +1,13 @@
 
 import { loginHandler } from '../../auth';
+import session from 'express-session';
 
 export default function handler(req, res) {
-  if (req.method === 'POST') {
+  session({
+    secret: 'secret-key',
+    resave: false,
+    saveUninitialized: true,
+  })(req, res, () => {
     return loginHandler(req, res);
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
+  });
 }
