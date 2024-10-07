@@ -1,0 +1,230 @@
+.markdown-preview h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
+    .markdown-preview h2 { font-size: 1.5em; font-weight: bold; margin: 0.83em 0; }
+    .markdown-preview h3 { font-size: 1.17em; font-weight: bold; margin: 1em 0; }
+    .markdown-preview p { margin: 1em 0; }
+    .markdown-preview code { 
+      background-color: #f8f8f8; 
+      padding: 0.2em 0.4em; 
+      border-radius: 3px;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.9em;
+    }
+    .markdown-preview pre { 
+      background-color: #2b2b2b; 
+      padding: 1em; 
+      border-radius: 5px; 
+      overflow-x: auto;
+    }
+    .markdown-preview pre code {
+      background-color: transparent;
+      color: #a9b7c6;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+    }
+    .markdown-preview blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 1em; }
+    .markdown-preview ul, .markdown-preview ol { padding-left: 2em; }
+    .markdown-preview img { max-width: 100%; }
+    .markdown-preview a { color: #0366d6; text-decoration: none; }
+    .markdown-preview a:hover { text-decoration: underline; }
+    .markdown-preview table { border-collapse: collapse; width: 100%; }
+    .markdown-preview table th, .markdown-preview table td { border: 1px solid #ddd; padding: 6px 13px; }
+    
+    /* IntelliJ IDEA-like syntax highlighting */
+    code[class*="language-"],
+    pre[class*="language-"] {
+      color: #a9b7c6;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+      font-size: 0.9em !important;
+      direction: ltr;
+      text-align: left;
+      white-space: pre;
+      word-spacing: normal;
+      word-break: normal;
+      line-height: 1.5;
+      background: #2b2b2b;
+    }
+
+    /* IntelliJ IDEA-like tokens */
+    .token.comment { color: #808080; }
+    .token.string { color: #6A8759; }
+    .token.keyword { color: #cc7832; font-weight: bold; }
+    .token.function { color: #FFC66D; }
+    .token.number { color: #6897BB; }
+    .token.operator { color: #a9b7c6; }
+    .token.class-name { color: #a9b7c6; }
+    .token.constant { color: #9876AA; }
+    .token.punctuation { color: #a9b7c6; }
+    .token.property { color: #9876AA; }
+    .token.boolean { color: #cc7832; }
+    .token.annotation { color: #BBB529; }
+    .token.builtin { color: #8888c6; }
+    .language-java .token.annotation { color: #BBB529; }
+    .language-java .token.keyword { color: #cc7832; }
+    .language-java .token.function { color: #FFC66D; }
+    .language-java .token.class-name { color: #a9b7c6; }
+    .language-java .token.string { color: #6A8759; }
+    .language-java .token.number { color: #6897BB; }
+
+    /* Enhanced list styles */
+    .markdown-preview ul {
+      list-style-type: disc;
+      margin-left: 1em;
+      padding-left: 1em;
+    }
+
+    .markdown-preview ol {
+      list-style-type: decimal;
+      margin-left: 1em;
+      padding-left: 1em;
+    }
+
+    .markdown-preview ul ul {
+      list-style-type: circle;
+    }
+
+    .markdown-preview ul ul ul {
+      list-style-type: square;
+    }
+
+    .markdown-preview li {
+      margin: 0.5em 0;
+    }
+
+    /* Collapsible section styles */
+    .collapse-trigger {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .collapse-trigger i {
+      transition: transform 0.3s ease;
+    }
+
+    .collapse-trigger.collapsed i {
+      transform: rotate(-90deg);
+    }
+
+    .collapse-content {
+      transition: height 0.3s ease-out;
+      overflow: hidden;
+    }
+
+    .collapse-content.collapsed {
+      height: 0 !important;
+    }
+
+    /* Markdown heading styles with collapse arrows */
+    .markdown-preview h1,
+    .markdown-preview h2,
+    .markdown-preview h3,
+    .markdown-preview h4,
+    .markdown-preview h5,
+    .markdown-preview h6 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .markdown-preview h1 .collapse-arrow,
+    .markdown-preview h2 .collapse-arrow,
+    .markdown-preview h3 .collapse-arrow,
+    .markdown-preview h4 .collapse-arrow,
+    .markdown-preview h5 .collapse-arrow,
+    .markdown-preview h6 .collapse-arrow {
+      cursor: pointer;
+      font-size: 0.8em;
+      transition: transform 0.3s ease;
+    }
+
+    .markdown-preview .collapsed .collapse-arrow {
+      transform: rotate(-90deg);
+    }
+
+    /* Heading section structure */
+.heading-section {
+  position: relative;
+}
+
+/* Ensure proper spacing between sections */
+.heading-section .section-content {
+  padding-left: 1.5rem;
+}
+
+/* Collapse content styling */
+.collapse-content {
+  transition: height 0.3s ease-out;
+  overflow: hidden;
+}
+
+.collapse-content.collapsed {
+  height: 0 !important;
+}
+
+/* Trigger styling */
+.collapse-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Arrow styling */
+.collapse-trigger .collapse-arrow {
+  transition: transform 0.3s ease;
+  font-size: 0.8em;
+}
+
+.collapse-trigger.collapsed .collapse-arrow {
+  transform: rotate(-90deg);
+}
+
+/* Nested section indentation */
+.heading-section .heading-section {
+  margin-left: 1rem;
+}
+
+/* Remove default margin from headings */
+.collapse-trigger {
+  margin: 0;
+}
+
+/* Section styling */
+.heading-section {
+    margin-bottom: 1rem;
+  }
+  
+  /* Content styling */
+  .section-content {
+    padding-left: 1.5rem;
+  }
+  
+  /* Collapse content styling */
+  .collapse-content {
+    transition: height 0.3s ease-out;
+    overflow: hidden;
+  }
+  
+  .collapse-content.collapsed {
+    height: 0 !important;
+  }
+  
+  /* Heading trigger styling */
+  .collapse-trigger {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Arrow styling */
+  .collapse-trigger .collapse-arrow {
+    transition: transform 0.3s ease;
+    font-size: 0.8em;
+  }
+  
+  .collapse-trigger.collapsed .collapse-arrow {
+    transform: rotate(-90deg);
+  }
