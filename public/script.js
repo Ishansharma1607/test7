@@ -195,6 +195,54 @@ async function loadText() {
   }
 }
 
+document.getElementById('uploadButton').addEventListener('click', () => {
+  document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/upload-file', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Upload successful!');
+      } else {
+        alert('Upload failed!');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Upload failed!');
+    });
+  }
+});
+
+document.getElementById('downloadButton').addEventListener('click', () => {
+  fetch('/download-file')
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'downloaded_file';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Download failed!');
+    });
+});
+
 // Initialize on page load
 window.addEventListener('load', loadText);
 

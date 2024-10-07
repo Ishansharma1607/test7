@@ -27,6 +27,13 @@ const createTableQuery = `
     text_content TEXT NOT NULL
   )
 `;
-db.exec(createTableQuery);
+const createFileTableQuery = `
+  CREATE TABLE IF NOT EXISTS user_files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_name TEXT NOT NULL,
+    file_path TEXT NOT NULL
+  )
+`;
+db.exec(createFileTableQuery);
 
 module.exports = db;

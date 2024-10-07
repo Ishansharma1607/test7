@@ -1,0 +1,187 @@
+// Configure marked options for markdown parsing
+
+marked.setOptions({
+  breaks: true,        // Enable line breaks
+  gfm: true,          // Enable GitHub Flavored Markdown
+  pedantic: false,    // Don't be too strict with markdown spec
+  headerIds: true,    // Generate IDs for headers
+  mangle: false,      // Don't mangle header IDs
+  highlight: function(code, lang) {
+    // Syntax highlighting for code blocks
+    if (Prism.languages[lang]) {
+      return Prism.highlight(code, Prism.languages[lang], lang);
+    }
+    return code;
+  }
+});
+
+// Initialize custom renderer for markdown
+const renderer = new marked.Renderer();
+
+// Custom renderer for headings - adds collapse functionality
+renderer.heading = function(text, level) {
+  const escapedText = text.toLowerCase().replace(/[^\w]+/g, '-');
+  return `
+    <h${level} id="${escapedText}" class="collapse-trigger">
+      <i class="fas fa-chevron-down collapse-arrow"></i>
+      <span>${text}</span>
+    </h${level}>
+    <div class="collapse-content">
+  `;
+};
+
+// Custom renderer for lists
+renderer.list = function(body, ordered) {
+  const type = ordered ? 'ol' : 'ul';
+  return `<${type}>${body}</${type}>`;
+};
+
+// Custom renderer for list items
+renderer.listitem = function(text) {
+  return `<li>${text}</li>`;
+};
+
+// Set the custom renderer
+marked.setOptions({ renderer });
+
+// State management
+let isPreviewMode = true; // Default to preview mode
+const editorSection = document.getElementById('editorSection');
+const previewSection = document.getElementById('previewSection');
+const toggleButton = document.getElementById('togglePreview');
+const container = document.getElementById('editorContainer');
+const previewState = document.getElementById('previewState');
+
+// Function to set preview mode state
+function setPreviewMode(showPreview) {
+  isPreviewMode = showPreview;
+  if (isPreviewMode) {
+    editorSection.classList.add('hidden');
+    previewSection.classList.remove('hidden');
+    updatePreview(document.getElementById('textArea').value);
+    toggleButton.textContent = 'Show Editor';
+  } else {
+    editorSection.classList.remove('hidden');
+    previewSection.classList.add('hidden');
+    toggleButton.textContent = 'Show Preview';
+  }
+  // Update hidden input value and localStorage
+  previewState.value = isPreviewMode;
+  localStorage.setItem('previewMode', isPreviewMode);
+}
+
+// Toggle between preview and editor modes
+function togglePreview() {
+  setPreviewMode(!isPreviewMode);
+}
+
+// Add click handler for toggle button
+toggleButton.addEventListener('click', togglePreview);
+
+// Function to process markdown with proper list handling
+function processMarkdown(markdown) {
+  // Add extra newlines before lists for proper parsing
+  markdown = markdown.replace(/^[-*+]/gm, '\n$&');
+  markdown = markdown.replace(/^\d+\./gm, '\n$&');
+  
+  // Process the markdown
+  return marked.parse(markdown);
+}
+
+// Function to update the preview pane
+function updatePreview(markdown) {
+  try {
+    const htmlContent = processMarkdown(markdown);
+    const preview = document.getElementById('preview');
+    preview.innerHTML = htmlContent;
+    
+    // Add closing divs for collapse sections
+    let headingLevel = 0;
+    const elements = preview.children;
+    for (let i = elements.length - 1; i >= 0; i--) {
+      const el = elements[i];
+      if (el.tagName.match(/^H[1-6]$/)) {
+        const level = parseInt(el.tagName[1]);
+        while (headingLevel >= level) {
+          el.insertAdjacentHTML('afterend', '</div>');
+          headingLevel--;
+        }
+        headingLevel = level;
+      }
+    }
+    
+    // Initialize collapse functionality
+    initializeCollapse();
+    
+    // Highlight code blocks
+    document.querySelectorAll('#preview pre code').forEach((block) => {
+      Prism.highlightElement(block);
+    });
+  } catch (error) {
+    console.error('Error updating preview:', error);
+  }
+}
+
+// Initialize collapse functionality for sections
+function initializeCollapse() {
+  document.querySelectorAll('.collapse-trigger').forEach(trigger => {
+    if (!trigger.hasListener) {
+      trigger.hasListener = true;
+      trigger.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        if (content && content.classList.contains('collapse-content')) {
+          const isCollapsed = content.classList.contains('collapsed');
+          
+          if (isCollapsed) {
+            // Expand the section
+            content.classList.remove('collapsed');
+            this.classList.remove('collapsed');
+            content.style.height = content.scrollHeight + 'px';
+          } else {
+            // Collapse the section
+            content.style.height = content.scrollHeight + 'px';
+            content.offsetHeight; // Force reflow
+            content.classList.add('collapsed');
+            this.classList.add('collapsed');
+          }
+        }
+      });
+    }
+  });
+}
+
+// Load saved text from server
+async function loadText() {
+  try {
+    const response = await fetch('/load-text');
+    const text = await response.text();
+    document.getElementById('textArea').value = text;
+    updatePreview(text);
+    
+    // Restore preview state
+    const savedPreviewMode = localStorage.getItem('previewMode');
+    if (savedPreviewMode !== null) {
+      setPreviewMode(savedPreviewMode === 'true');
+    } else {
+      setPreviewMode(true); // Default to preview mode if no saved state
+    }
+  } catch (error) {
+    console.error('Error loading text:', error);
+  }
+}
+
+// Add input handler for textarea
+document.getElementById('textArea').addEventListener('input', function() {
+  if (isPreviewMode) {
+    updatePreview(this.value);
+  }
+});
+
+// Handle form submission
+document.getElementById('editorForm').addEventListener('submit', function(e) {
+  // Save preview state before form submission
+  localStorage.setItem('previewMode', isPreviewMode);
+});
+
+// Initialize on page load
+window.addEventListener('load', loadText);

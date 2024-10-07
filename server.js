@@ -63,6 +63,32 @@ app.get('/load-text', authMiddleware, (req, res) => {
   }
 });
 
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
+app.post('/upload-file', upload.single('file'), (req, res) => {
+  const file = req.file;
+  if (!file) {
+    return res.status(400).json({ success: false, message: 'No file uploaded' });
+  }
+
+  const insertQuery = db.prepare('INSERT INTO user_files (file_name, file_path) VALUES (?, ?)');
+  insertQuery.run(file.originalname, file.path);
+
+  res.json({ success: true, message: 'File uploaded successfully' });
+});
+
+app.get('/download-file', (req, res) => {
+  const selectQuery = db.prepare('SELECT file_name, file_path FROM user_files ORDER BY id DESC LIMIT 1');
+  const row = selectQuery.get();
+
+  if (!row) {
+    return res.status(404).json({ success: false, message: 'No file found' });
+  }
+
+  res.download(row.file_path, row.file_name);
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
