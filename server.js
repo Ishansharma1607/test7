@@ -28,7 +28,7 @@ app.post('/login', loginHandler);
 
 app.get('/logout', logoutHandler);
 
-app.get('/app', authMiddleware, (req, res) => {
+app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'app.html'));
 });
 

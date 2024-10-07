@@ -1,20 +1,189 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App</title>
-<link href="/output.css" rel="stylesheet">
+  <title>Markdown Editor</title>
+  <link href="/output.css" rel="stylesheet">
+  <!-- Remove default Prism theme as we'll use custom colors -->
+  <!-- Add Font Awesome for collapse arrows -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .markdown-preview h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
+    .markdown-preview h2 { font-size: 1.5em; font-weight: bold; margin: 0.83em 0; }
+    .markdown-preview h3 { font-size: 1.17em; font-weight: bold; margin: 1em 0; }
+    .markdown-preview p { margin: 1em 0; }
+    .markdown-preview code { 
+      background-color: #f8f8f8; 
+      padding: 0.2em 0.4em; 
+      border-radius: 3px;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+      font-size: 0.9em;
+    }
+    .markdown-preview pre { 
+      background-color: #2b2b2b; 
+      padding: 1em; 
+      border-radius: 5px; 
+      overflow-x: auto;
+    }
+    .markdown-preview pre code {
+      background-color: transparent;
+      color: #a9b7c6;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+    }
+    .markdown-preview blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 1em; }
+    .markdown-preview ul, .markdown-preview ol { padding-left: 2em; }
+    .markdown-preview img { max-width: 100%; }
+    .markdown-preview a { color: #0366d6; text-decoration: none; }
+    .markdown-preview a:hover { text-decoration: underline; }
+    .markdown-preview table { border-collapse: collapse; width: 100%; }
+    .markdown-preview table th, .markdown-preview table td { border: 1px solid #ddd; padding: 6px 13px; }
+    
+    /* IntelliJ IDEA-like syntax highlighting */
+    code[class*="language-"],
+    pre[class*="language-"] {
+      color: #a9b7c6;
+      font-family: 'JetBrains Mono', Consolas, Monaco, monospace !important;
+      font-size: 0.9em !important;
+      direction: ltr;
+      text-align: left;
+      white-space: pre;
+      word-spacing: normal;
+      word-break: normal;
+      line-height: 1.5;
+      background: #2b2b2b;
+    }
+
+    /* IntelliJ IDEA-like tokens */
+    .token.comment { color: #808080; }
+    .token.string { color: #6A8759; }
+    .token.keyword { color: #cc7832; font-weight: bold; }
+    .token.function { color: #FFC66D; }
+    .token.number { color: #6897BB; }
+    .token.operator { color: #a9b7c6; }
+    .token.class-name { color: #a9b7c6; }
+    .token.constant { color: #9876AA; }
+    .token.punctuation { color: #a9b7c6; }
+    .token.property { color: #9876AA; }
+    .token.boolean { color: #cc7832; }
+    .token.annotation { color: #BBB529; }
+    .token.builtin { color: #8888c6; }
+    .language-java .token.annotation { color: #BBB529; }
+    .language-java .token.keyword { color: #cc7832; }
+    .language-java .token.function { color: #FFC66D; }
+    .language-java .token.class-name { color: #a9b7c6; }
+    .language-java .token.string { color: #6A8759; }
+    .language-java .token.number { color: #6897BB; }
+
+    /* Enhanced list styles */
+    .markdown-preview ul {
+      list-style-type: disc;
+      margin-left: 1em;
+      padding-left: 1em;
+    }
+
+    .markdown-preview ol {
+      list-style-type: decimal;
+      margin-left: 1em;
+      padding-left: 1em;
+    }
+
+    .markdown-preview ul ul {
+      list-style-type: circle;
+    }
+
+    .markdown-preview ul ul ul {
+      list-style-type: square;
+    }
+
+    .markdown-preview li {
+      margin: 0.5em 0;
+    }
+
+    /* Collapsible section styles */
+    .collapse-trigger {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .collapse-trigger i {
+      transition: transform 0.3s ease;
+    }
+
+    .collapse-trigger.collapsed i {
+      transform: rotate(-90deg);
+    }
+
+    .collapse-content {
+      transition: height 0.3s ease-out;
+      overflow: hidden;
+    }
+
+    .collapse-content.collapsed {
+      height: 0 !important;
+    }
+
+    /* Markdown heading styles with collapse arrows */
+    .markdown-preview h1,
+    .markdown-preview h2,
+    .markdown-preview h3,
+    .markdown-preview h4,
+    .markdown-preview h5,
+    .markdown-preview h6 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .markdown-preview h1 .collapse-arrow,
+    .markdown-preview h2 .collapse-arrow,
+    .markdown-preview h3 .collapse-arrow,
+    .markdown-preview h4 .collapse-arrow,
+    .markdown-preview h5 .collapse-arrow,
+    .markdown-preview h6 .collapse-arrow {
+      cursor: pointer;
+      font-size: 0.8em;
+      transition: transform 0.3s ease;
+    }
+
+    .markdown-preview .collapsed .collapse-arrow {
+      transform: rotate(-90deg);
+    }
+  </style>
 </head>
-<body class="flex items-center justify-center h-screen bg-gray-100">
-  <div class="w-full max-w-2xl">
-    <form action="/save-text" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-      <h2 class="text-2xl font-bold mb-6 text-center">Enter Text 3</h2>
-      <div class="mb-4">
-        <textarea id="textArea" name="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="10" placeholder="Enter your text here..."></textarea>
+<body class="flex items-center justify-center min-h-screen bg-gray-100 py-8">
+  <div class="w-full max-w-4xl mx-4">
+    <form action="/save-text" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" id="editorForm">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Markdown Editor</h2>
+        <button 
+          type="button" 
+          id="togglePreview" 
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Toggle Preview
+        </button>
       </div>
-      <div class="flex items-center justify-between">
+      <div class="grid grid-cols-1 gap-6" id="editorContainer">
+        <div id="editorSection">
+          <textarea 
+            id="textArea" 
+            name="text" 
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            rows="20" 
+            placeholder="Enter your markdown text here..."
+          ></textarea>
+        </div>
+        <div id="previewSection" class="hidden">
+          <div 
+            id="preview" 
+            class="markdown-preview shadow border rounded w-full py-2 px-3 bg-white h-[calc(20rem*1.5)] overflow-y-auto"
+          ></div>
+        </div>
+      </div>
+      <div class="flex items-center justify-between mt-6">
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
           Save
         </button>
@@ -22,25 +191,204 @@
           Logout
         </a>
       </div>
+      <!-- Add hidden input to store preview state -->
+      <input type="hidden" name="previewState" id="previewState" value="true">
     </form>
   </div>
-  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
-  <script>
-    async function loadText() {
-      const response = await fetch('/load-text');
-      const text = await response.text();
-      ClassicEditor
-        .create(document.querySelector('#textArea'))
-        .then(editor => {
-          editor.setData(text);
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    }
 
-    window.onload = loadText;
+  <!-- Add Marked.js for Markdown parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+  <!-- Add Prism.js for syntax highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+  <script>
+    // Configure marked options for markdown parsing
+    marked.setOptions({
+      breaks: true,        // Enable line breaks
+      gfm: true,          // Enable GitHub Flavored Markdown
+      pedantic: false,    // Don't be too strict with markdown spec
+      headerIds: true,    // Generate IDs for headers
+      mangle: false,      // Don't mangle header IDs
+      highlight: function(code, lang) {
+        // Syntax highlighting for code blocks
+        if (Prism.languages[lang]) {
+          return Prism.highlight(code, Prism.languages[lang], lang);
+        }
+        return code;
+      }
+    });
+  
+    // Initialize custom renderer for markdown
+    const renderer = new marked.Renderer();
+    
+    // Custom renderer for headings - adds collapse functionality
+    renderer.heading = function(text, level) {
+      const escapedText = text.toLowerCase().replace(/[^\w]+/g, '-');
+      return `
+        <h${level} id="${escapedText}" class="collapse-trigger">
+          <i class="fas fa-chevron-down collapse-arrow"></i>
+          <span>${text}</span>
+        </h${level}>
+        <div class="collapse-content">
+      `;
+    };
+  
+    // Custom renderer for lists
+    renderer.list = function(body, ordered) {
+      const type = ordered ? 'ol' : 'ul';
+      return `<${type}>${body}</${type}>`;
+    };
+  
+    // Custom renderer for list items
+    renderer.listitem = function(text) {
+      return `<li>${text}</li>`;
+    };
+  
+    // Set the custom renderer
+    marked.setOptions({ renderer });
+  
+    // State management
+    let isPreviewMode = true; // Default to preview mode
+    const editorSection = document.getElementById('editorSection');
+    const previewSection = document.getElementById('previewSection');
+    const toggleButton = document.getElementById('togglePreview');
+    const container = document.getElementById('editorContainer');
+    const previewState = document.getElementById('previewState');
+  
+    // Function to set preview mode state
+    function setPreviewMode(showPreview) {
+      isPreviewMode = showPreview;
+      if (isPreviewMode) {
+        editorSection.classList.add('hidden');
+        previewSection.classList.remove('hidden');
+        updatePreview(document.getElementById('textArea').value);
+        toggleButton.textContent = 'Show Editor';
+      } else {
+        editorSection.classList.remove('hidden');
+        previewSection.classList.add('hidden');
+        toggleButton.textContent = 'Show Preview';
+      }
+      // Update hidden input value and localStorage
+      previewState.value = isPreviewMode;
+      localStorage.setItem('previewMode', isPreviewMode);
+    }
+  
+    // Toggle between preview and editor modes
+    function togglePreview() {
+      setPreviewMode(!isPreviewMode);
+    }
+  
+    // Add click handler for toggle button
+    toggleButton.addEventListener('click', togglePreview);
+  
+    // Function to process markdown with proper list handling
+    function processMarkdown(markdown) {
+      // Add extra newlines before lists for proper parsing
+      markdown = markdown.replace(/^[-*+]/gm, '\n$&');
+      markdown = markdown.replace(/^\d+\./gm, '\n$&');
+      
+      // Process the markdown
+      return marked.parse(markdown);
+    }
+  
+    // Function to update the preview pane
+    function updatePreview(markdown) {
+      try {
+        const htmlContent = processMarkdown(markdown);
+        const preview = document.getElementById('preview');
+        preview.innerHTML = htmlContent;
+        
+        // Add closing divs for collapse sections
+        let headingLevel = 0;
+        const elements = preview.children;
+        for (let i = elements.length - 1; i >= 0; i--) {
+          const el = elements[i];
+          if (el.tagName.match(/^H[1-6]$/)) {
+            const level = parseInt(el.tagName[1]);
+            while (headingLevel >= level) {
+              el.insertAdjacentHTML('afterend', '</div>');
+              headingLevel--;
+            }
+            headingLevel = level;
+          }
+        }
+        
+        // Initialize collapse functionality
+        initializeCollapse();
+        
+        // Highlight code blocks
+        document.querySelectorAll('#preview pre code').forEach((block) => {
+          Prism.highlightElement(block);
+        });
+      } catch (error) {
+        console.error('Error updating preview:', error);
+      }
+    }
+  
+    // Initialize collapse functionality for sections
+    function initializeCollapse() {
+      document.querySelectorAll('.collapse-trigger').forEach(trigger => {
+        if (!trigger.hasListener) {
+          trigger.hasListener = true;
+          trigger.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            if (content && content.classList.contains('collapse-content')) {
+              const isCollapsed = content.classList.contains('collapsed');
+              
+              if (isCollapsed) {
+                // Expand the section
+                content.classList.remove('collapsed');
+                this.classList.remove('collapsed');
+                content.style.height = content.scrollHeight + 'px';
+              } else {
+                // Collapse the section
+                content.style.height = content.scrollHeight + 'px';
+                content.offsetHeight; // Force reflow
+                content.classList.add('collapsed');
+                this.classList.add('collapsed');
+              }
+            }
+          });
+        }
+      });
+    }
+  
+    // Load saved text from server
+    async function loadText() {
+      try {
+        const response = await fetch('/load-text');
+        const text = await response.text();
+        document.getElementById('textArea').value = text;
+        updatePreview(text);
+        
+        // Restore preview state
+        const savedPreviewMode = localStorage.getItem('previewMode');
+        if (savedPreviewMode !== null) {
+          setPreviewMode(savedPreviewMode === 'true');
+        } else {
+          setPreviewMode(true); // Default to preview mode if no saved state
+        }
+      } catch (error) {
+        console.error('Error loading text:', error);
+      }
+    }
+  
+    // Add input handler for textarea
+    document.getElementById('textArea').addEventListener('input', function() {
+      if (isPreviewMode) {
+        updatePreview(this.value);
+      }
+    });
+  
+    // Handle form submission
+    document.getElementById('editorForm').addEventListener('submit', function(e) {
+      // Save preview state before form submission
+      localStorage.setItem('previewMode', isPreviewMode);
+    });
+  
+    // Initialize on page load
+    window.addEventListener('load', loadText);
   </script>
 </body>
 </html>
-
