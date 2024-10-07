@@ -197,3 +197,5 @@ async function loadText() {
 
 // Initialize on page load
 window.addEventListener('load', loadText);
+
+
