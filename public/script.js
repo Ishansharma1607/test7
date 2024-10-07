@@ -226,16 +226,35 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
 
 document.getElementById('downloadButton').addEventListener('click', () => {
   fetch('/download-file')
-    .then(response => response.blob())
-    .then(blob => {
+    .then(response => {
+      // Get the filename from the Content-Disposition header
+      const disposition = response.headers.get('Content-Disposition');
+      let filename = 'downloaded_file'; // fallback filename
+      
+      if (disposition && disposition.indexOf('attachment') !== -1) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(disposition);
+        if (matches != null && matches[1]) {
+          filename = matches[1].replace(/['"]/g, '');
+          // decode the URI encoded filename
+          filename = decodeURIComponent(filename);
+        }
+      }
+      
+      return response.blob().then(blob => ({ blob, filename }));
+    })
+    .then(({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = 'downloaded_file';
+      a.download = filename; // Use the filename from the server
       document.body.appendChild(a);
       a.click();
+      
+      // Cleanup
       window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     })
     .catch(error => {
       console.error('Error:', error);
