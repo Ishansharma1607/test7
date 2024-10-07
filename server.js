@@ -1,10 +1,10 @@
-
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { authMiddleware, loginHandler, logoutHandler } = require('./auth');
 const db = require('./db');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -64,7 +64,18 @@ app.get('/load-text', authMiddleware, (req, res) => {
 });
 
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    // Keep the original file name but make it safe for the file system
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, Date.now() + '-' + safeName);
+  }
+});
+
+const upload = multer({ storage: storage });
 
 app.post('/upload-file', upload.single('file'), (req, res) => {
   const file = req.file;
@@ -86,7 +97,29 @@ app.get('/download-file', (req, res) => {
     return res.status(404).json({ success: false, message: 'No file found' });
   }
 
-  res.download(row.file_path, row.file_name);
+  // Check if file exists
+  if (!fs.existsSync(row.file_path)) {
+    return res.status(404).json({ success: false, message: 'File not found on server' });
+  }
+
+  // Set proper headers
+  res.set({
+    'Content-Type': 'application/octet-stream',
+    'Content-Disposition': `attachment; filename="${encodeURIComponent(row.file_name)}"`,
+    'Content-Description': 'File Transfer'
+  });
+
+  // Stream the file
+  const fileStream = fs.createReadStream(row.file_path);
+  fileStream.pipe(res);
+
+  // Handle errors during streaming
+  fileStream.on('error', (error) => {
+    console.error('Error streaming file:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: 'Error downloading file' });
+    }
+  });
 });
 
 app.listen(PORT, () => {
