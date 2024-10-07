@@ -24,19 +24,21 @@
       </div>
     </form>
   </div>
-  <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/markdown/markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script>
   <script>
     async function loadText() {
       const response = await fetch('/load-text');
       const text = await response.text();
-      ClassicEditor
-        .create(document.querySelector('#textArea'))
-        .then(editor => {
-          editor.setData(text);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      const editor = CodeMirror.fromTextArea(document.getElementById('textArea'), {
+        mode: 'text/x-java',
+        theme: 'monokai',
+        lineNumbers: true
+      });
+      editor.setValue(text);
     }
 
     window.onload = loadText;
